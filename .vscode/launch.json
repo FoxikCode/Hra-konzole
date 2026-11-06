@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Hra v externím terminálu",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/mechova_hra.py",
+      "console": "externalTerminal"
+    }
+  ]
+}
