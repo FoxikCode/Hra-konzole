@@ -22,6 +22,7 @@ Boj (jako v Undertale):
 Spuštění:  python mechova_hra.py      (Python 3.6+, bez dalších knihoven)
 """
 import os
+import subprocess
 import sys
 import time
 import random
@@ -48,6 +49,11 @@ COLORS = {
     "~": "\033[34m", "F": "\033[38;5;208m",
     "r": "\033[31m", "g": "\033[32m", "s": "\033[35m", "O": "\033[91m",
 }
+
+
+def _is_windows():
+    return os.name == "nt"
+
 
 # ---------------------------------------------------------------------------
 #  Nepřátelé
@@ -154,7 +160,7 @@ class RawMode:
     """Čtení kláves bez Enteru a skrytý kurzor po dobu hry."""
 
     def __enter__(self):
-        if os.name != "nt":
+        if not _is_windows():
             import termios
             import tty
             self.fd = sys.stdin.fileno()
@@ -164,8 +170,8 @@ class RawMode:
         sys.stdout.flush()
         return self
 
-    def __exit__(self, *exc):
-        if os.name != "nt":
+    def __exit__(self, *_):
+        if not _is_windows():
             import termios
             termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old)
         sys.stdout.write("\033[?25h" + RESET)
@@ -180,7 +186,7 @@ def _decode(data):
 
 def poll(timeout=None):
     """Vrátí stisknutou klávesu, "" pro neznámou, nebo None při vypršení času."""
-    if os.name == "nt":
+    if _is_windows():
         import msvcrt
         end = None if timeout is None else time.time() + timeout
         while True:
@@ -932,9 +938,9 @@ class Game:
 
 
 def main():
-    if os.name == "nt":
-        os.system("")              # zapne ANSI barvy ve Windows
-        os.system("chcp 65001 >nul")
+    if _is_windows():
+        subprocess.run("", shell=True, check=False)  # zapne ANSI barvy ve Windows
+        subprocess.run("chcp 65001 >nul", shell=True, check=False)
     try:
         with RawMode():
             while True:
